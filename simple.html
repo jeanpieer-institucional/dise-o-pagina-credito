@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Préstamos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .form-container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .summary {
+            background-color: #eaf2f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simulador de Préstamos Bancarios</h1>
+    
+    <div class="form-container">
+        <form id="loanForm">
+            <div class="form-group">
+                <label for="amount">Monto del préstamo ($):</label>
+                <input type="number" id="amount" name="amount" min="1" required>
+                <div id="amountError" class="error hidden"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="interest">Tasa de interés anual (%):</label>
+                <select id="interest" name="interest" required>
+                    <option value="">Seleccione una tasa</option>
+                    <option value="12">12%</option>
+                    <option value="15">15%</option>
+                    <option value="18">18%</option>
+                    <option value="20">20%</option>
+                    <option value="24">24%</option>
+                </select>
+                <div id="interestError" class="error hidden"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="term">Plazo en meses:</label>
+                <select id="term" name="term" required>
+                    <option value="">Seleccione un plazo</option>
+                    <option value="6">6 meses</option>
+                    <option value="12">12 meses</option>
+                    <option value="24">24 meses</option>
+                </select>
+                <div id="termError" class="error hidden"></div>
+            </div>
+            
+            <button type="submit">Calcular Cronograma</button>
+        </form>
+    </div>
+    
+    <div id="results" class="results hidden">
+        <div class="summary">
+            <h2>Resumen del Préstamo</h2>
+            <p><strong>Monto del préstamo:</strong> $<span id="summaryAmount"></span></p>
+            <p><strong>Tasa de interés anual:</strong> <span id="summaryInterest"></span>%</p>
+            <p><strong>Plazo:</strong> <span id="summaryTerm"></span> meses</p>
+            <p><strong>Cuota mensual:</strong> $<span id="monthlyPayment"></span></p>
+            <p><strong>Total de intereses:</strong> $<span id="totalInterest"></span></p>
+            <p><strong>Total a pagar:</strong> $<span id="totalPayment"></span></p>
+        </div>
+        
+        <h2>Cronograma de Pagos</h2>
+        <div class="table-container">
+            <table id="paymentSchedule">
+                <thead>
+                    <tr>
+                        <th>Cuota #</th>
+                        <th>Cuota Mensual</th>
+                        <th>Interés</th>
+                        <th>Capital</th>
+                        <th>Saldo Pendiente</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loanForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obtener valores del formulario
+            const amount = parseFloat(document.getElementById('amount').value);
+            const interest = parseFloat(document.getElementById('interest').value);
+            const term = parseInt(document.getElementById('term').value);
+            
+            // Validar los datos
+            if (!validateInputs(amount, interest, term)) {
+                return;
+            }
+            
+            // Calcular el cronograma
+            const schedule = calculateLoanSchedule(amount, interest, term);
+            
+            // Mostrar resultados
+            displayResults(amount, interest, term, schedule);
+        });
+        
+        function validateInputs(amount, interest, term) {
+            let isValid = true;
+            
+            // Validar monto
+            if (isNaN(amount) || amount <= 0) {
+                document.getElementById('amountError').textContent = 'Ingrese un monto válido mayor a cero';
+                document.getElementById('amountError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('amountError').classList.add('hidden');
+            }
+            
+            // Validar tasa de interés
+            if (isNaN(interest) || interest <= 0) {
+                document.getElementById('interestError').textContent = 'Seleccione una tasa de interés válida';
+                document.getElementById('interestError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('interestError').classList.add('hidden');
+            }
+            
+            // Validar plazo
+            if (isNaN(term) || term <= 0) {
+                document.getElementById('termError').textContent = 'Seleccione un plazo válido';
+                document.getElementById('termError').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('termError').classList.add('hidden');
+            }
+            
+            return isValid;
+        }
+        
+        function calculateLoanSchedule(amount, annualInterest, term) {
+            const monthlyInterest = annualInterest / 100 / 12;
+            const monthlyPayment = amount * (monthlyInterest * Math.pow(1 + monthlyInterest, term)) / (Math.pow(1 + monthlyInterest, term) - 1);
+            
+            let balance = amount;
+            const schedule = [];
+            let totalInterest = 0;
+            
+            for (let month = 1; month <= term; month++) {
+                const interestPayment = balance * monthlyInterest;
+                const principalPayment = monthlyPayment - interestPayment;
+                totalInterest += interestPayment;
+                
+                schedule.push({
+                    month,
+                    payment: monthlyPayment,
+                    interest: interestPayment,
+                    principal: principalPayment,
+                    balance: balance - principalPayment
+                });
+                
+                balance -= principalPayment;
+            }
+            
+            return {
+                monthlyPayment,
+                totalInterest,
+                totalPayment: amount + totalInterest,
+                schedule
+            };
+        }
+        
+        function displayResults(amount, interest, term, loanData) {
+            // Mostrar resumen
+            document.getElementById('summaryAmount').textContent = amount.toFixed(2);
+            document.getElementById('summaryInterest').textContent = interest;
+            document.getElementById('summaryTerm').textContent = term;
+            document.getElementById('monthlyPayment').textContent = loanData.monthlyPayment.toFixed(2);
+            document.getElementById('totalInterest').textContent = loanData.totalInterest.toFixed(2);
+            document.getElementById('totalPayment').textContent = loanData.totalPayment.toFixed(2);
+            
+            // Mostrar cronograma
+            const scheduleBody = document.getElementById('scheduleBody');
+            scheduleBody.innerHTML = '';
+            
+            loanData.schedule.forEach(payment => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${payment.month}</td>
+                    <td>${payment.payment.toFixed(2)}</td>
+                    <td>${payment.interest.toFixed(2)}</td>
+                    <td>${payment.principal.toFixed(2)}</td>
+                    <td>${payment.balance > 0 ? payment.balance.toFixed(2) : '0.00'}</td>
+                `;
+                
+                scheduleBody.appendChild(row);
+            });
+            
+            // Mostrar la sección de resultados
+            document.getElementById('results').classList.remove('hidden');
+            
+            // Desplazarse a los resultados
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

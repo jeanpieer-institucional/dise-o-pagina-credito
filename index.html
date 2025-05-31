@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Préstamos | Banco Profesional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="src/style/style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-university"></i>
+                <div class="logo-text">
+                    <h1>Banco Profesional</h1>
+                    <p>Soluciones financieras a tu medida</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="badge badge-success">En línea</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-calculator"></i> Simulador de Préstamos</h2>
+                </div>
+                <form id="loanForm">
+                    <div class="form-group">
+                        <label for="amount">Monto del préstamo</label>
+                        <div class="input-group">
+                            <i class="fas fa-dollar-sign"></i>
+                            <input type="number" id="amount" class="form-control" placeholder="Ej: 10000" min="1" required>
+                        </div>
+                        <div id="amountError" class="error-message">Ingrese un monto válido</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interest">Tasa de interés anual</label>
+                        <select id="interest" class="form-control" required>
+                            <option value="">Seleccione una tasa</option>
+                            <option value="8">8% - Tasa preferencial</option>
+                            <option value="12">12% - Tasa estándar</option>
+                            <option value="15">15% - Tasa especial</option>
+                            <option value="18">18% - Tasa regular</option>
+                            <option value="22">22% - Tasa extendida</option>
+                        </select>
+                        <div id="interestError" class="error-message">Seleccione una tasa de interés</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="term">Plazo de financiamiento</label>
+                        <select id="term" class="form-control" required>
+                            <option value="">Seleccione un plazo</option>
+                            <option value="6">6 meses</option>
+                            <option value="12">12 meses</option>
+                            <option value="18">18 meses</option>
+                            <option value="24">24 meses</option>
+                            <option value="36">36 meses</option>
+                            <option value="48">48 meses</option>
+                            <option value="60">60 meses</option>
+                        </select>
+                        <div id="termError" class="error-message">Seleccione un plazo válido</div>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        <i class="fas fa-calculator"></i> Calcular Cronograma
+                    </button>
+                </form>
+            </div>
+
+            <div class="card results-card" id="resultsCard">
+                <div class="card-header">
+                    <h2><i class="fas fa-file-invoice-dollar"></i> Resultados de la Simulación</h2>
+                    <i class="fas fa-chart-line"></i>
+                </div>
+
+                <div class="highlight">
+                    <div class="highlight-item">
+                        <span>Cuota mensual:</span>
+                        <span class="value" id="monthlyPayment">$0.00</span>
+                    </div>
+                    <div class="highlight-item">
+                        <span>Total a pagar:</span>
+                        <span class="value" id="totalPayment">$0.00</span>
+                    </div>
+                    <div class="highlight-item">
+                        <span>Total intereses:</span>
+                        <span class="value" id="totalInterest">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Monto del préstamo:</span>
+                        <strong id="summaryAmount">$0.00</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Tasa de interés anual:</span>
+                        <strong id="summaryInterest">0%</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Plazo:</span>
+                        <strong id="summaryTerm">0 meses</strong>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 25px; margin-bottom: 15px;">
+                    <i class="fas fa-calendar-alt"></i> Cronograma de Pagos
+                </h3>
+
+                <div class="scrollable-table">
+                    <table id="paymentSchedule">
+                        <thead>
+                            <tr>
+                                <th>Cuota</th>
+                                <th class="text-right">Cuota</th>
+                                <th class="text-right">Interés</th>
+                                <th class="text-right">Capital</th>
+                                <th class="text-right">Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn print-btn" onclick="window.print()">
+                    <i class="fas fa-print"></i> Imprimir Cronograma
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2023 Banco Profesional. Todos los derechos reservados.</p>
+            <p class="text-muted">
+                <small>
+                    <i class="fas fa-info-circle"></i> Los resultados son estimados y pueden variar según aprobación crediticia.
+                </small>
+            </p>
+        </div>
+    </footer>
+
+    <script src="src/scripts/scrips.js"></script>
+</body>
+</html>

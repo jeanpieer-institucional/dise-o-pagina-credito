@@ -120,6 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             function formatCurrency(value) {
-                return '$' + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                return 'S/. ' + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, 'S/. &,');
             }
         });
